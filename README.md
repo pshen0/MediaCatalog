@@ -1,6 +1,6 @@
-# SecDev Course Template
+# Media Catalog
 
-Стартовый шаблон для студенческого репозитория (HSE SecDev 2025).
+Студенческий проект HSE SecDev 2025: каталог фильмов и курсов «к просмотру» с REST API.
 
 ## Быстрый старт
 ```bash
@@ -38,10 +38,66 @@ docker run --rm -p 8000:8000 secdev-app
 docker compose up --build
 ```
 
+## Модели
+Media
+| Поле     | Тип                                  | Описание                       |
+| -------- | ------------------------------------ | ------------------------------ |
+| id       | str                                  | Уникальный идентификатор       |
+| title    | str                                  | Название фильма/курса          |
+| kind     | "movie"/"course".                    | Тип записи                     |
+| year     | int                                  | Год выпуска (1900 – текущий+1) |
+| status   | "planned"/"watching"/"completed"     | Статус просмотра               |
+| owner_id | str                                  | ID владельца записи            |
+
+User
+| Поле     | Тип | Описание         |
+| -------- | --- | ---------------- |
+| id       | str | Уникальный ID    |
+| username | str | Имя пользователя |
+
+
 ## Эндпойнты
-- `GET /health` → `{"status": "ok"}`
-- `POST /items?name=...` — демо-сущность
-- `GET /items/{id}`
+/health
+GET /health -> {"status": "ok"}
+
+/media
+
+### POST /media/ - создание новой записи.
+Пример:
+```bash
+  curl -X POST "http://127.0.0.1:8000/media/" \
+  -H "Content-Type: application/json" \
+  -H "X-User-Id: 123" \
+  -d '{"title":"Inception","kind":"movie","year":2010,"status":"planned"}'
+```
+
+### GET /media/?kind=movie&status=planned - список записей пользователя с фильтрацией по kind и status.
+Пример:
+```bash
+  curl -H "X-User-Id: 123" "http://127.0.0.1:8000/media/"
+```
+
+### GET /media/{id} - получение конкретной записи.
+Пример:
+```bash
+  curl -H "X-User-Id: 123" "http://127.0.0.1:8000/media/<id>"
+```
+
+### PUT /media/{id} - обновление записи.
+Пример:
+```bash
+  curl -X PUT "http://127.0.0.1:8000/media/<id>" \
+  -H "Content-Type: application/json" \
+  -H "X-User-Id: 123" \
+  -d '{"status":"completed"}'
+```
+
+### DELETE /media/{id} - даление записи.
+Пример:
+```bash
+  curl -X DELETE "http://127.0.0.1:8000/media/<id>" \
+  -H "X-User-Id: 123"
+```
 
 ## Формат ошибок
 Все ошибки — JSON-обёртка:
@@ -50,5 +106,3 @@ docker compose up --build
   "error": {"code": "not_found", "message": "item not found"}
 }
 ```
-
-См. также: `SECURITY.md`, `.pre-commit-config.yaml`, `.github/workflows/ci.yml`.

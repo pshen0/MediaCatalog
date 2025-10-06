@@ -67,7 +67,7 @@ def get_current_user(x_user_id: Optional[str] = Header(None)):
 @router.post("/", response_model=MediaOut, status_code=status.HTTP_201_CREATED)
 def create_media(payload: MediaCreate, user=Depends(get_current_user)):
     new_id = str(uuid4())
-    obj = payload.dict()
+    obj = payload.model_dump()
     obj.update({"id": new_id, "owner_id": user["id"]})
     MEDIA_DB[new_id] = obj
     return obj
@@ -113,7 +113,7 @@ def update_media(media_id: str, payload: MediaUpdate, user=Depends(get_current_u
     if m["owner_id"] != user["id"]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
-    update_data = payload.dict(exclude_unset=True)
+    update_data = payload.model_dump(exclude_unset=True)
     if update_data:
         m.update(update_data)
         MEDIA_DB[media_id] = m

@@ -1,55 +1,13 @@
-from datetime import datetime
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
-from pydantic import BaseModel, Field, field_validator
+
+from app.schemas.media import KindType, MediaCreate, MediaOut, MediaUpdate, StatusType
 
 router = APIRouter()
 
 MEDIA_DB: Dict[str, dict] = {}
-
-KindType = Literal["movie", "course"]
-StatusType = Literal["planned", "watching", "completed"]
-
-
-class MediaBase(BaseModel):
-    title: str = Field(..., min_length=1)
-    kind: KindType
-    year: int
-    status: StatusType
-
-    @field_validator("year")
-    def year_must_be_reasonable(cls, v: int) -> int:
-        current = datetime.now().year
-        if v < 1900 or v > current + 1:
-            raise ValueError(f"year must be between 1900 and {current + 1}")
-        return v
-
-
-class MediaCreate(MediaBase):
-    pass
-
-
-class MediaUpdate(BaseModel):
-    title: Optional[str] = None
-    kind: Optional[KindType] = None
-    year: Optional[int] = None
-    status: Optional[StatusType] = None
-
-    @field_validator("year")
-    def year_must_be_reasonable(cls, v: Optional[int]) -> Optional[int]:
-        if v is None:
-            return v
-        current = datetime.now().year
-        if v < 1900 or v > current + 1:
-            raise ValueError(f"year must be between 1900 and {current + 1}")
-        return v
-
-
-class MediaOut(MediaBase):
-    id: str
-    owner_id: str
 
 
 def get_current_user(x_user_id: Optional[str] = Header(None)):

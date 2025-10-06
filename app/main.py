@@ -1,7 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-app = FastAPI(title="SecDev Course App", version="0.1.0")
+from app.api import media as media_router
+
+app = FastAPI(title="Media Catalog", version="0.1.0")
+app.include_router(media_router.router, prefix="/media", tags=["media"])
 
 
 class ApiError(Exception):

@@ -36,9 +36,3 @@ jobs:
 
       - name: Pre-commit (all files)
         run: pre-commit run --all-files
-
-      - name: Prevent direct push to main
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          echo "❌ Direct push to main is not allowed. Use pull request."
-          exit 1

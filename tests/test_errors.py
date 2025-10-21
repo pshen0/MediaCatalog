@@ -17,3 +17,18 @@ def test_validation_error():
     assert r.status_code == 422
     body = r.json()
     assert body["error"]["code"] == "validation_error"
+
+
+def test_internal_error_rfc7807():
+    r = client.get("/error")
+    assert r.status_code == 500
+    body = r.json()
+
+    assert "type" in body
+    assert "title" in body
+    assert "status" in body
+    assert "detail" in body
+    assert "correlation_id" in body
+
+    assert body["detail"] == "An unexpected error occurred."
+    assert "ValueError" not in str(body)

@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from app.api import media as media_router
+from app.core.middleware import RFC7807Middleware
 
 app = FastAPI(title="Media Catalog", version="0.1.0")
 app.include_router(media_router.router, prefix="/media", tags=["media"])
+app.add_middleware(RFC7807Middleware)
 
 
 class ApiError(Exception):
@@ -58,3 +60,8 @@ def get_item(item_id: int):
         if it["id"] == item_id:
             return it
     raise ApiError(code="not_found", message="item not found", status=404)
+
+
+@app.get("/error")
+async def error_endpoint():
+    raise ValueError("This should not leak to client")

@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 
+from app.core.rfc7807_handler import problem
 from app.schemas.media import KindType, MediaCreate, MediaOut, MediaUpdate, StatusType
 
 router = APIRouter()
@@ -24,10 +25,16 @@ def get_current_user(x_user_id: Optional[str] = Header(None)):
 
 @router.post("/", response_model=MediaOut, status_code=status.HTTP_201_CREATED)
 def create_media(payload: MediaCreate, user=Depends(get_current_user)):
-    new_id = str(uuid4())
+    record_id = str(uuid4())
     obj = payload.model_dump()
-    obj.update({"id": new_id, "owner_id": user["id"]})
-    MEDIA_DB[new_id] = obj
+    obj.update(
+        {
+            "id": record_id,
+            "record_id": record_id,
+            "owner_id": user["id"],
+        }
+    )
+    MEDIA_DB[record_id] = obj
     return obj
 
 
@@ -41,51 +48,51 @@ def list_media(
     for m in MEDIA_DB.values():
         if m["owner_id"] != user["id"]:
             continue
-        if kind is not None and m["kind"] != kind:
+        if kind and m["kind"] != kind:
             continue
-        if status is not None and m["status"] != status:
+        if status and m["status"] != status:
             continue
         results.append(m)
     return results
 
 
-@router.get("/{media_id}", response_model=MediaOut)
-def get_media(media_id: str, user=Depends(get_current_user)):
-    m = MEDIA_DB.get(media_id)
+@router.get("/{record_id}", response_model=MediaOut)
+def get_media(record_id: str, user=Depends(get_current_user)):
+    m = MEDIA_DB.get(record_id)
     if not m:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Media not found"
-        )
+        return problem(status=404, title="Not Found", detail="Media not found")
     if m["owner_id"] != user["id"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return problem(
+            status=403, title="Forbidden", detail="Cannot access others' media"
+        )
     return m
 
 
-@router.put("/{media_id}", response_model=MediaOut)
-def update_media(media_id: str, payload: MediaUpdate, user=Depends(get_current_user)):
-    m = MEDIA_DB.get(media_id)
+@router.put("/{record_id}", response_model=MediaOut)
+def update_media(record_id: str, payload: MediaUpdate, user=Depends(get_current_user)):
+    m = MEDIA_DB.get(record_id)
     if not m:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Media not found"
-        )
+        return problem(status=404, title="Not Found", detail="Media not found")
     if m["owner_id"] != user["id"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return problem(
+            status=403, title="Forbidden", detail="Cannot modify others' media"
+        )
 
     update_data = payload.model_dump(exclude_unset=True)
-    if update_data:
-        m.update(update_data)
-        MEDIA_DB[media_id] = m
+
+    m.update(update_data)
+    MEDIA_DB[record_id] = m
     return m
 
 
-@router.delete("/{media_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_media(media_id: str, user=Depends(get_current_user)):
-    m = MEDIA_DB.get(media_id)
+@router.delete("/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_media(record_id: str, user=Depends(get_current_user)):
+    m = MEDIA_DB.get(record_id)
     if not m:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Media not found"
-        )
+        return problem(status=404, title="Not Found", detail="Media not found")
     if m["owner_id"] != user["id"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-    del MEDIA_DB[media_id]
+        return problem(
+            status=403, title="Forbidden", detail="Cannot delete others' media"
+        )
+    del MEDIA_DB[record_id]
     return Response(status_code=status.HTTP_204_NO_CONTENT)

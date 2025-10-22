@@ -101,4 +101,11 @@ CRUD операций по user_id — только для владельца
 ## Links
 - NFR-03, NFR-08;
 - R5, F5, R6, SVC;
-- tests/<файл>::<тест>
+- app/api/media.py, app/schemas/media.py
+- tests/test_media.py::test_get_nonexistent_media
+- tests/test_media.py::test_update_nonexistent_media
+- tests/test_media.py::test_delete_nonexistent_media
+- tests/test_media.py::test_update_media_forbidden
+- tests/test_media.py::test_delete_media_forbidden_correlation
+
+### Изменения по этому ADR находятся в коммите - ADR & Tests: Implement ADR-002, secure Media API with RFC7807 errors and correlation_id - 55c8ef9c2ba1b2a65232d36c4f1c3a4ce4eeac63

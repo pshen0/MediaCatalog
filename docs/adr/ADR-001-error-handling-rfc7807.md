@@ -71,3 +71,5 @@ Definition of Done:
 - R4, R8, F4
 - middleware.py, rfc7807_handler.py, main.py
 - tests/test_errors.py::test_internal_error_rfc7807
+
+### Изменения по этому ADR находятся в коммите - ADR & Tests: Implement ADR-001 RFC7807 error handling and correlation_id - 4b8eac029b89323806f7a11dd7e024038026841e

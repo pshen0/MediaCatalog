@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -145,3 +147,65 @@ def test_delete_media_forbidden(auth_header):
     other_header = {"X-User-Id": "intruder"}
     r2 = client.delete(f"/media/{media_id}", headers=other_header)
     assert r2.status_code == 403
+
+
+def test_get_nonexistent_media(auth_header):
+    r = client.get("/media/nonexistent-id", headers=auth_header)
+    assert r.status_code == 404
+    data = r.json()
+    assert data["title"] == "Not Found"
+    assert "correlation_id" in data
+    assert re.match(r"^[a-f0-9\-]{36}$", data["correlation_id"])
+
+
+def test_update_nonexistent_media(auth_header):
+    payload = {"title": "DoesNotExist"}
+    r = client.put("/media/nonexistent-id", json=payload, headers=auth_header)
+    assert r.status_code == 404
+    data = r.json()
+    assert data["title"] == "Not Found"
+    assert "correlation_id" in data
+
+
+def test_delete_nonexistent_media(auth_header):
+    r = client.delete("/media/nonexistent-id", headers=auth_header)
+    assert r.status_code == 404
+    data = r.json()
+    assert data["title"] == "Not Found"
+    assert "correlation_id" in data
+
+
+def test_update_media_forbidden(auth_header):
+    r = client.post(
+        "/media/",
+        json={"title": "Private", "kind": "movie", "year": 2020, "status": "planned"},
+        headers=auth_header,
+    )
+    media_id = r.json()["id"]
+
+    other_header = {"X-User-Id": "intruder"}
+    r2 = client.put(
+        f"/media/{media_id}", json={"title": "Hacked"}, headers=other_header
+    )
+    assert r2.status_code == 403
+    data = r2.json()
+    assert data["title"] == "Forbidden"
+    assert "correlation_id" in data
+
+
+def test_delete_media_forbidden_correlation(auth_header):
+    r = client.post(
+        "/media/",
+        json={"title": "Secret2", "kind": "movie", "year": 2020, "status": "planned"},
+        headers=auth_header,
+    )
+    media_id = r.json()["id"]
+
+    other_header = {"X-User-Id": "intruder"}
+    r2 = client.delete(f"/media/{media_id}", headers=other_header)
+    assert r2.status_code == 403
+    data = r2.json()
+    assert data["title"] == "Forbidden"
+    assert data["status"] == 403
+    assert "correlation_id" in data
+    assert re.match(r"^[a-f0-9\-]{36}$", data["correlation_id"])

@@ -44,3 +44,4 @@ class MediaUpdate(BaseModel):
 class MediaOut(MediaBase):
     id: str
     owner_id: str
+    record_id: str

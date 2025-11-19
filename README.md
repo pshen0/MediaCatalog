@@ -1,6 +1,8 @@
 # Media Catalog
 
 Студенческий проект HSE SecDev 2025: каталог фильмов и курсов «к просмотру» с REST API.
+![CI](https://github.com/pshen0/MediaCatalog/actions/workflows/ci.yml/badge.svg)
+
 
 ## Быстрый старт
 ```bash

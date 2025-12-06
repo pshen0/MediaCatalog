@@ -29,8 +29,12 @@ pytest -q
 ```
 
 ## CI
-В репозитории настроен workflow **CI** (GitHub Actions) — required check для `main`.
-Badge добавится автоматически после загрузки шаблона в GitHub.
+В репозитории настроены следующие workflows (GitHub Actions):
+
+- **CI/CD** (`ci.yml`) — тесты и линтинг, required check для `main`
+- **Security - SBOM & SCA** (`ci-sbom-sca.yml`) — автоматическая генерация SBOM и сканирование уязвимостей зависимостей
+
+Артефакты безопасности доступны в `EVIDENCE/P09/` и через GitHub Actions artifacts. См. `EVIDENCE/P09/README.md` для подробностей.
 
 ## Контейнеры
 ```bash

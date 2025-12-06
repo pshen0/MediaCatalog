@@ -1,0 +1,47 @@
+title = "Media Catalog Gitleaks Configuration"
+
+# Расширяем встроенные правила Gitleaks
+[extend]
+# Используем все встроенные правила по умолчанию
+useDefault = true
+
+[allowlist]
+description = "Ignore non-sensitive patterns and test files"
+
+# Игнорируем директории с артефактами и документацией
+paths = [
+  "EVIDENCE/",           # Отчёты и артефакты безопасности
+  "docs/",              # Документация проекта
+  ".github/",            # GitHub workflows и конфигурации
+  "tests/",              # Тестовые файлы
+  "*.md",                # Markdown файлы (могут содержать примеры)
+  "requirements*.txt",   # Файлы зависимостей (могут содержать примеры версий)
+]
+
+# Игнорируем коммиты (если нужно)
+commits = []
+
+# Регулярные выражения для игнорирования ложных срабатываний
+regexes = [
+  # Примеры в документации и тестах
+  '''TEST_SECRET_DO_NOT_USE''',
+  '''example.*key''',
+  '''dummy.*token''',
+  '''placeholder.*secret''',
+
+  # UUID и другие не-секретные строки
+  '''[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}''',
+
+  # Примеры в README и документации
+  '''curl.*-H.*X-User-Id.*123''',
+]
+
+# Игнорируем определённые файлы
+[allowlist.paths]
+# Файлы конфигурации, которые могут содержать примеры
+paths = [
+  "README.md",
+  "SECURITY.md",
+  "compose.yaml",
+  "Dockerfile",
+]

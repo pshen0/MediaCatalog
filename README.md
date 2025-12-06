@@ -33,8 +33,13 @@ pytest -q
 
 - **CI/CD** (`ci.yml`) — тесты и линтинг, required check для `main`
 - **Security - SBOM & SCA** (`ci-sbom-sca.yml`) — автоматическая генерация SBOM и сканирование уязвимостей зависимостей
+- **Security - SAST & Secrets** (`ci-sast-secrets.yml`) — статический анализ кода (Semgrep) и сканирование секретов (Gitleaks)
 
-Артефакты безопасности доступны в `EVIDENCE/P09/` и через GitHub Actions artifacts. См. `EVIDENCE/P09/README.md` для подробностей.
+Артефакты безопасности доступны:
+- `EVIDENCE/P09/` — SBOM и SCA отчёты (см. `EVIDENCE/P09/README.md`)
+- `EVIDENCE/P10/` — SAST и Secrets отчёты (см. `EVIDENCE/P10/README.md`)
+
+Все артефакты также доступны через GitHub Actions artifacts.
 
 ## Контейнеры
 ```bash

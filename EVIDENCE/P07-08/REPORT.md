@@ -1,16 +1,13 @@
 # Отчёт по практикам P07-08: Контейнеризация и CI/CD
 
 **Проект:** Media Catalog
-**Дата:** 2025-01-XX
-**Статус:** ✅ Выполнено на ★★2 (проектный уровень)
+**Дата:** 2025-12
 
 ---
 
 ## P07 — Контейнеризация
 
-### C1. Dockerfile (multi-stage, размер) ★★2
-
-**Статус:** ✅ Выполнено
+### C1. Dockerfile (multi-stage, размер)
 
 **Реализация:**
 
@@ -33,22 +30,9 @@
 - **Dockerfile:** `.github/workflows/ci.yml` → `docker-build` job
 - **Размер образа:** Проверяется через `docker images` после сборки
 - **История слоёв:** `docker history media-catalog:latest`
+<img width="1124" height="246" alt="Снимок экрана 2025-12-08 в 00 28 28" src="https://github.com/user-attachments/assets/9726b2ee-04a9-4a53-a441-705bd5ce5c46" />
+<img width="746" height="431" alt="Снимок экрана 2025-12-08 в 00 30 10" src="https://github.com/user-attachments/assets/a2b58dfa-f786-4515-8869-c5263ea612a0" />
 
-**Команды для проверки:**
-
-```bash
-# Сборка образа
-docker build -t media-catalog:latest .
-
-# Проверка размера
-docker images media-catalog:latest
-
-# История слоёв
-docker history media-catalog:latest
-
-# Сравнение с базовым образом
-docker images python:3.11-slim
-```
 
 **Результаты:**
 
@@ -58,9 +42,7 @@ docker images python:3.11-slim
 
 ---
 
-### C2. Безопасность контейнера ★★2
-
-**Статус:** ✅ Выполнено
+### C2. Безопасность контейнера
 
 **Реализация:**
 
@@ -84,29 +66,14 @@ docker images python:3.11-slim
 **Доказательства:**
 
 - **Dockerfile:** Строки 12-18, 25-28
+<img width="546" height="130" alt="Снимок экрана 2025-12-08 в 00 37 12" src="https://github.com/user-attachments/assets/5b25e868-ce60-4061-a3be-b59bbb053408" />
+<img width="368" height="73" alt="Снимок экрана 2025-12-08 в 00 37 45" src="https://github.com/user-attachments/assets/d4de173c-e3d3-4599-ac36-091d0c645f37" />
 - **Compose:** Healthcheck настроен в `compose.yaml`
 - **Проверка:** `docker inspect media-catalog:latest | grep -A 10 "User"`
 
-**Команды для проверки:**
-
-```bash
-# Проверка пользователя
-docker inspect media-catalog:latest | grep -A 5 "User"
-
-# Проверка healthcheck
-docker inspect media-catalog:latest | grep -A 10 "Healthcheck"
-
-# Запуск контейнера и проверка
-docker run -d --name test-container media-catalog:latest
-docker exec test-container whoami  # Должно быть: appuser
-docker ps --format "table {{.Names}}\t{{.Status}}"  # Проверка healthcheck
-```
-
 ---
 
-### C3. Compose/локальный запуск ★★2
-
-**Статус:** ✅ Выполнено
+### C3. Compose/локальный запуск
 
 **Реализация:**
 
@@ -131,37 +98,17 @@ docker ps --format "table {{.Names}}\t{{.Status}}"  # Проверка healthche
 - **compose.yaml:** Полная конфигурация с сервисами
 - **Лог запуска:** `docker compose up --profile full`
 
-**Команды для проверки:**
-
-```bash
-# Запуск полного стека
-docker compose --profile full up -d
-
-# Запуск только приложения
-docker compose --profile standalone up -d
-
-# Проверка статуса
-docker compose ps
-
-# Логи
-docker compose logs app
-
-# Остановка
-docker compose down
-```
 
 **Результаты:**
 
-- ✅ Все сервисы поднимаются успешно
-- ✅ Healthcheck проходит для всех сервисов
-- ✅ Приложение доступно на http://localhost:8000
-- ✅ База данных доступна на localhost:5432
+- Все сервисы поднимаются успешно
+- Healthcheck проходит для всех сервисов
+- Приложение доступно на http://localhost:8000
+- База данных доступна на localhost:5432
 
 ---
 
-### C4. Сканирование образа (Trivy/Hadolint) ★★2
-
-**Статус:** ✅ Выполнено
+### C4. Сканирование образа (Trivy/Hadolint)
 
 **Реализация:**
 
@@ -189,32 +136,20 @@ docker compose down
   - `reports/hadolint.json` — отчёт Hadolint
   - `reports/trivy.sarif` — отчёт Trivy (SARIF)
   - `reports/trivy-fs.txt` — отчёт Trivy (таблица)
+ <img width="367" height="547" alt="Снимок экрана 2025-12-08 в 00 40 12" src="https://github.com/user-attachments/assets/536a8d0f-b8a6-40d7-8692-00a39467b7c1" />
 
-**Команды для локальной проверки:**
 
-```bash
-# Hadolint
-docker run --rm -i hadolint/hadolint < Dockerfile
-
-# Trivy image scan
-trivy image media-catalog:latest
-
-# Trivy filesystem scan
-trivy fs .
-```
 
 **Результаты:**
 
-- ✅ Hadolint не обнаружил критичных проблем
-- ✅ Trivy сканирует образ и файловую систему
-- ✅ Отчёты сохраняются в артефакты CI
-- ✅ Критичные уязвимости отслеживаются и устраняются
+- Hadolint не обнаружил критичных проблем
+- Trivy сканирует образ и файловую систему
+- Отчёты сохраняются в артефакты CI
+- Критичные уязвимости отслеживаются и устраняются
 
 ---
 
-### C5. Контейнеризация своего приложения ★★2
-
-**Статус:** ✅ Выполнено
+### C5. Контейнеризация своего приложения 
 
 **Реализация:**
 
@@ -238,37 +173,20 @@ trivy fs .
 - **Репозиторий:** Dockerfile и compose.yaml в корне проекта
 - **CI:** `.github/workflows/ci.yml` с job `docker-build`
 - **Запуск:** `docker compose up` поднимает приложение
-
-**Проверка работы:**
-
-```bash
-# Запуск приложения
-docker compose --profile standalone up -d
-
-# Проверка health
-curl http://localhost:8000/health
-
-# Проверка API
-curl -H "X-User-Id: 123" http://localhost:8000/media/
-
-# Логи
-docker compose logs -f app
-```
+<img width="298" height="449" alt="Снимок экрана 2025-12-08 в 00 40 50" src="https://github.com/user-attachments/assets/33d1235e-8a7d-40d5-bf9b-3e8970492e56" />
 
 **Результаты:**
 
-- ✅ Приложение успешно запускается в контейнере
-- ✅ Все эндпоинты доступны и работают
-- ✅ Интеграция с CI/CD настроена
-- ✅ Локальный запуск через docker compose работает
+- Приложение успешно запускается в контейнере
+- Все эндпоинты доступны и работают
+- Интеграция с CI/CD настроена
+- Локальный запуск через docker compose работает
 
 ---
 
 ## P08 — CI/CD
 
-### C1. Сборка и тесты ★★2
-
-**Статус:** ✅ Выполнено
+### C1. Сборка и тесты
 
 **Реализация:**
 
@@ -293,19 +211,19 @@ docker compose logs -f app
 - **CI workflow:** `.github/workflows/ci.yml`
 - **Лог CI:** GitHub Actions → последний успешный run
 - **Матрица:** Строки 27-30 в ci.yml
+<img width="1470" height="448" alt="Снимок экрана 2025-12-08 в 00 42 12" src="https://github.com/user-attachments/assets/bd4bd869-905c-4b6e-b805-b6bd77189d45" />
+<img width="724" height="422" alt="Снимок экрана 2025-12-08 в 00 43 24" src="https://github.com/user-attachments/assets/a6a5ceb1-6e7f-48fe-81f1-52696b8e4af3" />
 
 **Результаты:**
 
-- ✅ Build проходит успешно
-- ✅ Все тесты проходят на всех версиях Python
-- ✅ Линтинг проходит без ошибок
-- ✅ CI run зелёный
+- Build проходит успешно
+- Все тесты проходят на всех версиях Python
+- Линтинг проходит без ошибок
+- CI run зелёный
 
 ---
 
-### C2. Кэширование/конкурренси ★★2
-
-**Статус:** ✅ Выполнено
+### C2. Кэширование/конкурренси
 
 **Реализация:**
 
@@ -333,19 +251,18 @@ docker compose logs -f app
 
 - **Workflow:** `.github/workflows/ci.yml` → строки 12-14, 41-50
 - **Docker cache:** Строки в `docker-build` job
+<img width="539" height="206" alt="Снимок экрана 2025-12-08 в 00 44 11" src="https://github.com/user-attachments/assets/e280021c-a6f4-4008-8056-0e5b72991340" />
 
 **Результаты:**
 
-- ✅ Кэш pip ускоряет установку зависимостей
-- ✅ Docker cache ускоряет сборку образа
-- ✅ Concurrency предотвращает дубликаты запусков
-- ✅ Оптимизированные ключи кэша по requirements.txt
+- Кэш pip ускоряет установку зависимостей
+- Docker cache ускоряет сборку образа
+- Concurrency предотвращает дубликаты запусков
+- Оптимизированные ключи кэша по requirements.txt
 
 ---
 
-### C3. Секреты и конфиги ★★2
-
-**Статус:** ✅ Выполнено
+### C3. Секреты и конфиги
 
 **Реализация:**
 
@@ -370,6 +287,9 @@ docker compose logs -f app
 - **Workflow:** `.github/workflows/ci.yml` → строки 16-19
 - **Настройки:** GitHub → Settings → Secrets and variables → Actions
 - **Использование:** Секреты используются только в env, не в логах
+<img width="341" height="86" alt="Снимок экрана 2025-12-08 в 00 44 48" src="https://github.com/user-attachments/assets/eed8ac49-019a-410c-96b1-c81357876ea2" />
+<img width="727" height="248" alt="Снимок экрана 2025-12-08 в 00 45 51" src="https://github.com/user-attachments/assets/fb91c1b0-5b67-42f5-b3ad-a23cf5d427b2" />
+
 
 **Настроенные секреты:**
 
@@ -379,16 +299,14 @@ docker compose logs -f app
 
 **Результаты:**
 
-- ✅ Секреты не хранятся в коде
-- ✅ Секреты не видны в логах
-- ✅ Настроены для разных окружений
-- ✅ Безопасное использование в CI/CD
+- Секреты не хранятся в коде
+- Секреты не видны в логах
+- Настроены для разных окружений
+- Безопасное использование в CI/CD
 
 ---
 
-### C4. Артефакты/репорты ★★2
-
-**Статус:** ✅ Выполнено
+### C4. Артефакты/репорты
 
 **Реализация:**
 
@@ -413,19 +331,20 @@ docker compose logs -f app
 - **Файлы:**
   - `junit-*.xml` — отчёты тестов
   - `docker-scan-reports/` — отчёты сканирования
+<img width="1165" height="486" alt="Снимок экрана 2025-12-08 в 00 46 31" src="https://github.com/user-attachments/assets/ae39b3ca-48a1-47f5-8883-5e049936feca" />
+<img width="724" height="382" alt="Снимок экрана 2025-12-08 в 00 47 19" src="https://github.com/user-attachments/assets/bc11d7f4-5412-4177-9f57-de6d27756f39" />
+
 
 **Результаты:**
 
-- ✅ Все артефакты сохраняются
-- ✅ Отчёты доступны для анализа
-- ✅ SARIF формат для интеграции с GitHub
-- ✅ Retention настроен (90 дней для отчётов безопасности)
+- Все артефакты сохраняются
+- Отчёты доступны для анализа
+- SARIF формат для интеграции с GitHub
+- Retention настроен (90 дней для отчётов безопасности)
 
 ---
 
-### C5. CD/промоушн (эмуляция) ★★2
-
-**Статус:** ✅ Выполнено
+### C5. CD/промоушн (эмуляция)
 
 **Реализация:**
 
@@ -449,13 +368,14 @@ docker compose logs -f app
 - **Workflow:** `.github/workflows/ci.yml` → `cd-mock` job
 - **Условия:** Строки 77-91
 - **Лог:** GitHub Actions → последний run → `cd-mock` job
+<img width="621" height="388" alt="Снимок экрана 2025-12-08 в 00 48 09" src="https://github.com/user-attachments/assets/c0616510-efdd-48df-b83c-8bbf10f9f974" />
 
 **Результаты:**
 
-- ✅ Mock deploy настроен
-- ✅ Запускается только на main
-- ✅ Использует секреты безопасно
-- ✅ Готов к расширению для реального деплоя
+- Mock deploy настроен
+- Запускается только на main
+- Использует секреты безопасно
+- Готов к расширению для реального деплоя
 
 ---
 
@@ -463,99 +383,37 @@ docker compose logs -f app
 
 ### Стабильность CI
 
-- ✅ Все прогоны зелёные
-- ✅ Матрица тестирования работает
-- ✅ Кэширование ускоряет сборку
-- ✅ Concurrency предотвращает конфликты
+- Все прогоны зелёные
+- Матрица тестирования работает
+- Кэширование ускоряет сборку
+- Concurrency предотвращает конфликты
 
 ### Сборка/тесты/артефакты
 
-- ✅ Сборка проходит успешно
-- ✅ Тесты проходят на всех версиях
-- ✅ Артефакты сохраняются
-- ✅ Отчёты доступны для анализа
+- Сборка проходит успешно
+- Тесты проходят на всех версиях
+- Артефакты сохраняются
+- Отчёты доступны для анализа
 
 ### Секреты вынесены из кода
 
-- ✅ Все секреты в GitHub Secrets
-- ✅ Не видны в логах
-- ✅ Безопасное использование
+- Все секреты в GitHub Secrets
+- Не видны в логах
+- Безопасное использование
 
 ### PR-политика и ревью
 
-- ✅ CI запускается на PR
-- ✅ Все проверки должны пройти
-- ✅ Шаблон PR заполнен
+- CI запускается на PR
+- Все проверки должны пройти
+- Шаблон PR заполнен
 
 ### Воспроизводимый локальный запуск
 
-- ✅ Docker compose поднимает весь стек
-- ✅ Dockerfile оптимизирован
-- ✅ Локальный запуск идентичен CI
+- Docker compose поднимает весь стек
+- Dockerfile оптимизирован
+- Локальный запуск идентичен CI
 
 ---
-
-## Дополнительные улучшения (9-10 баллов)
-
-### Кэш/матрица
-
-- ✅ Матрица Python версий и ОС
-- ✅ Кэширование pip зависимостей
-- ✅ Кэширование Docker слоёв через BuildKit
-
-### Отчёты покрытия
-
-- ⚠️ Можно добавить coverage отчёты (опционально)
-- ✅ JUnit XML отчёты для тестов
-- ✅ SARIF отчёты для безопасности
-
-### Релизные артефакты
-
-- ✅ Docker образ собирается в CI
-- ✅ Отчёты безопасности сохраняются
-- ⚠️ Можно добавить публикацию образа в registry (опционально)
-
----
-
-## Команды для проверки
-
-### Локальная проверка Docker
-
-```bash
-# Сборка образа
-docker build -t media-catalog:latest .
-
-# Проверка размера
-docker images media-catalog:latest
-
-# История слоёв
-docker history media-catalog:latest
-
-# Запуск контейнера
-docker run -d -p 8000:8000 --name test-app media-catalog:latest
-
-# Проверка health
-curl http://localhost:8000/health
-
-# Остановка
-docker stop test-app && docker rm test-app
-```
-
-### Локальная проверка Compose
-
-```bash
-# Запуск полного стека
-docker compose --profile full up -d
-
-# Проверка статуса
-docker compose ps
-
-# Логи
-docker compose logs -f app
-
-# Остановка
-docker compose down
-```
 
 ### Проверка CI
 
@@ -578,16 +436,14 @@ docker compose down
 
 ## Заключение
 
-Все критерии P07-08 выполнены на уровне ★★2 (проектный):
+Все критерии P07-08 выполнены:
 
-- ✅ Dockerfile оптимизирован для продакшн
-- ✅ Безопасность контейнера настроена
-- ✅ Compose описывает полный стек
-- ✅ Сканирование образа интегрировано в CI
-- ✅ Собственный сервис контейнеризирован
-- ✅ CI/CD настроен с матрицей и кэшем
-- ✅ Секреты вынесены из кода
-- ✅ Артефакты сохраняются
-- ✅ Mock deploy настроен
-
-Проект готов к продакшн использованию.
+- Dockerfile оптимизирован для продакшн
+- Безопасность контейнера настроена
+- Compose описывает полный стек
+- Сканирование образа интегрировано в CI
+- Собственный сервис контейнеризирован
+- CI/CD настроен с матрицей и кэшем
+- Секреты вынесены из кода
+- Артефакты сохраняются
+- Mock deploy настроен

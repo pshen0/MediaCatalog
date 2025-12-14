@@ -130,6 +130,9 @@ jobs:
         run: |
           docker load -i image.tar
 
+      - name: Create reports directory
+        run: mkdir -p reports
+
       - name: Run Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:

@@ -1,0 +1,24 @@
+{
+  "site": "http://localhost:8000",
+  "scanned": true,
+  "alerts": [
+    {
+      "name": "X-Frame-Options Header Not Set",
+      "risk": "Medium",
+      "confidence": "Medium",
+      "description": "X-Frame-Options header is not included in the HTTP response to protect against 'ClickJacking' attacks.",
+      "solution": "Most modern Web browsers support the X-Frame-Options HTTP header. Ensure it's set on all web pages returned by your site (if you expect the page to be framed only by pages on your server (e.g. it's part of a FRAMESET) then you'll want to use SAMEORIGIN, otherwise if you never expect the page to be framed, you should use DENY. Alternatively consider implementing Content Security Policy's \"frame-ancestors\" directive."
+    },
+    {
+      "name": "Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s)",
+      "risk": "Low",
+      "confidence": "Medium",
+      "description": "The web/application server is leaking information via one or more \"X-Powered-By\" HTTP response headers. Access to such information may facilitate attackers identifying other frameworks/components your web application is reliant upon and the vulnerabilities such components may be subject to.",
+      "solution": "Ensure that your web server, application server, load balancer, etc. is configured to suppress \"X-Powered-By\" headers."
+    }
+  ],
+  "highAlerts": 0,
+  "mediumAlerts": 1,
+  "lowAlerts": 1,
+  "infoAlerts": 0
+}

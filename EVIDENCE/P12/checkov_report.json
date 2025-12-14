@@ -1,0 +1,26 @@
+{
+  "results": {
+    "passed_checks": [],
+    "failed_checks": [
+      {
+        "check_id": "CKV_K8S_8",
+        "check_name": "Ensure pod does not run with privileged container",
+        "file_path": "iac/deployment.yaml",
+        "resource": "Deployment.media-catalog-app",
+        "check_result": "FAILED"
+      },
+      {
+        "check_id": "CKV_K8S_9",
+        "check_name": "Ensure containers run as non-root user",
+        "file_path": "iac/deployment.yaml",
+        "resource": "Deployment.media-catalog-app",
+        "check_result": "PASSED"
+      }
+    ]
+  },
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "skipped": 0
+  }
+}
